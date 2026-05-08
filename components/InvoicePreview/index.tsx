@@ -143,7 +143,16 @@ export default function InvoicePreview({ data, onShare }: Props) {
                 <img
                   src={data.logoUrl}
                   alt="Company logo"
-                  className="h-10 w-auto max-w-[180px] object-contain object-left mb-2"
+                  style={{
+                    display: "block",
+                    maxHeight: "40px",
+                    maxWidth: "150px",
+                    width: "auto",
+                    height: "auto",
+                    objectFit: "contain",
+                    objectPosition: "left center",
+                    marginBottom: "8px",
+                  }}
                 />
               )}
               <p
