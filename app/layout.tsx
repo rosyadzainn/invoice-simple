@@ -58,6 +58,9 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: "InvoiceSimple",
   },
+  verification: {
+    google: "lB3jd9e1s7cSANk2SC2mtl4hfQuYLUqIizYI9HuOGWI",
+  },
   robots: {
     index: true,
     follow: true,
