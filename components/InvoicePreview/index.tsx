@@ -147,7 +147,7 @@ export default function InvoicePreview({ data, onShare }: Props) {
                 />
               )}
               <p
-                className="text-base font-bold leading-tight truncate"
+                className="text-base font-bold leading-tight break-words"
                 style={{ color: C.black }}
               >
                 {data.senderName || (
@@ -155,7 +155,7 @@ export default function InvoicePreview({ data, onShare }: Props) {
                 )}
               </p>
               {data.senderEmail && (
-                <p className="text-xs truncate" style={{ color: C.muted }}>
+                <p className="text-xs break-all" style={{ color: C.muted }}>
                   {data.senderEmail}
                 </p>
               )}
