@@ -338,7 +338,7 @@ export default function InvoicePreview({ data, onShare }: Props) {
 
           {/* ── Totals ── */}
           <div className="flex justify-end mb-7">
-            <div className="w-48 flex flex-col gap-2">
+            <div className="w-full max-w-xs flex flex-col gap-2">
               <div className="flex justify-between text-sm" style={{ color: C.muted }}>
                 <span className="whitespace-nowrap">{t.subtotal}</span>
                 <span className="tabular-nums whitespace-nowrap">{fmt(subtotal)}</span>
