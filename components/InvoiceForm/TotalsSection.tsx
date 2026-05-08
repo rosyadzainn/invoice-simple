@@ -85,6 +85,15 @@ export default function TotalsSection({ data, onChange }: Props) {
         </div>
       </div>
 
+      {/* Payment Details */}
+      <Textarea
+        label={t.paymentDetails}
+        placeholder={t.phPaymentDetails}
+        value={data.paymentDetails}
+        onChange={(e) => onChange({ paymentDetails: e.target.value })}
+        rows={3}
+      />
+
       {/* Notes */}
       <Textarea
         label={t.notesPaymentTerms}

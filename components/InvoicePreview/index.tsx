@@ -377,13 +377,31 @@ export default function InvoicePreview({ data, onShare }: Props) {
             </div>
           </div>
 
+          {/* ── Payment Details ── */}
+          {data.paymentDetails && (
+            <>
+              <div className="h-px mb-5" style={{ backgroundColor: C.divider }} />
+              <div className="mb-5">
+                <p
+                  className="text-[9px] font-black uppercase tracking-[0.15em] mb-2"
+                  style={{ color: C.subtle }}
+                >
+                  {t.paymentDetails}
+                </p>
+                <p
+                  className="text-xs whitespace-pre-line leading-relaxed"
+                  style={{ color: C.muted }}
+                >
+                  {data.paymentDetails}
+                </p>
+              </div>
+            </>
+          )}
+
           {/* ── Notes ── */}
           {data.notes && (
             <>
-              <div
-                className="h-px mb-5"
-                style={{ backgroundColor: C.divider }}
-              />
+              <div className="h-px mb-5" style={{ backgroundColor: C.divider }} />
               <div>
                 <p
                   className="text-[9px] font-black uppercase tracking-[0.15em] mb-2"

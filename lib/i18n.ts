@@ -36,7 +36,9 @@ export interface Translations {
   subtotal: string;
   totalDue: string;
 
-  // Notes
+  // Payment & Notes
+  paymentDetails: string;
+  phPaymentDetails: string;
   notesPaymentTerms: string;
   notes: string;
 
@@ -118,6 +120,8 @@ const en: Translations = {
   taxRate: "Tax Rate",
   subtotal: "Subtotal",
   totalDue: "Total Due",
+  paymentDetails: "Payment Details",
+  phPaymentDetails: "Bank: BCA\nAccount: 1234567890\nAccount Name: Your Name",
   notesPaymentTerms: "Notes / Payment Terms",
   notes: "Notes",
   number: "Number",
@@ -165,6 +169,8 @@ const id: Translations = {
   taxRate: "Tarif Pajak",
   subtotal: "Subtotal",
   totalDue: "Total Tagihan",
+  paymentDetails: "Detail Pembayaran",
+  phPaymentDetails: "Bank: BCA\nNorek: 1234567890\nAtas Nama: Nama Kamu",
   notesPaymentTerms: "Catatan / Syarat Pembayaran",
   notes: "Catatan",
   number: "Nomor",
@@ -212,6 +218,8 @@ const es: Translations = {
   taxRate: "Tasa de impuesto",
   subtotal: "Subtotal",
   totalDue: "Total a pagar",
+  paymentDetails: "Detalles de pago",
+  phPaymentDetails: "Banco: BBVA\nCuenta: 1234567890\nNombre: Tu Nombre",
   notesPaymentTerms: "Notas / Condiciones de pago",
   notes: "Notas",
   number: "Número",
@@ -259,6 +267,8 @@ const fr: Translations = {
   taxRate: "Taux de TVA",
   subtotal: "Sous-total",
   totalDue: "Total à payer",
+  paymentDetails: "Détails de paiement",
+  phPaymentDetails: "Banque: BNP\nCompte: 1234567890\nNom: Votre Nom",
   notesPaymentTerms: "Notes / Conditions de paiement",
   notes: "Notes",
   number: "Numéro",
@@ -306,6 +316,8 @@ const ja: Translations = {
   taxRate: "税率",
   subtotal: "小計",
   totalDue: "合計金額",
+  paymentDetails: "お支払い情報",
+  phPaymentDetails: "銀行: ○○銀行\n口座番号: 1234567890\n口座名義: お名前",
   notesPaymentTerms: "備考・支払条件",
   notes: "備考",
   number: "番号",

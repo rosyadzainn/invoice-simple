@@ -30,6 +30,7 @@ const defaultInvoice: InvoiceData = {
   items: [{ id: "item-1", description: "", quantity: 1, rate: 0 }],
   discount: 0,
   taxRate: 0,
+  paymentDetails: "",
   notes: "",
 };
 

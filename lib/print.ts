@@ -65,6 +65,13 @@ export function printInvoice(
       </tr>`
     : "";
 
+  const paymentHtml = data.paymentDetails
+    ? `<div style="margin-top:32px;padding-top:24px;border-top:1px solid #f3f4f6">
+        <p style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:8px">${t.paymentDetails}</p>
+        <p style="font-size:12px;color:#6b7280;line-height:1.7">${esc(data.paymentDetails)}</p>
+      </div>`
+    : "";
+
   const notesHtml = data.notes
     ? `<div style="margin-top:32px;padding-top:24px;border-top:1px solid #f3f4f6">
         <p style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:8px">${t.notes}</p>
@@ -154,6 +161,8 @@ export function printInvoice(
         </tr>
       </tfoot>
     </table>
+
+    ${paymentHtml}
 
     ${notesHtml}
 

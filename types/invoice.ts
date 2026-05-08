@@ -33,6 +33,7 @@ export interface InvoiceData {
   // Totals
   discount: number;
   taxRate: number;
+  paymentDetails: string;
   notes: string;
 }
 
