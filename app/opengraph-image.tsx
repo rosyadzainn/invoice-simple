@@ -17,18 +17,18 @@ export default function Image() {
           alignItems: "center",
           justifyContent: "center",
           fontFamily: "sans-serif",
+          position: "relative",
         }}
       >
-        {/* Glow */}
+        {/* Glow backdrop */}
         <div
           style={{
             position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
+            top: "160px",
+            left: "300px",
             width: "600px",
             height: "300px",
-            background: "radial-gradient(ellipse, rgba(16,185,129,0.18) 0%, transparent 70%)",
+            background: "radial-gradient(ellipse, rgba(16,185,129,0.2) 0%, transparent 70%)",
             display: "flex",
           }}
         />
@@ -48,62 +48,103 @@ export default function Image() {
             marginBottom: "28px",
           }}
         >
-          100% FREE · NO SIGN-UP
+          100% FREE · NO SIGN-UP REQUIRED
         </div>
 
         {/* Logo row */}
-        <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "16px",
+            marginBottom: "20px",
+          }}
+        >
+          {/* Icon box */}
           <div
             style={{
-              width: "52px",
-              height: "52px",
-              borderRadius: "12px",
+              width: "56px",
+              height: "56px",
+              borderRadius: "14px",
               background: "linear-gradient(135deg, #10b981, #0d9488)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: "26px",
             }}
           >
-            📄
+            <div style={{ display: "flex", color: "#fff", fontSize: "28px", fontWeight: 900 }}>
+              S
+            </div>
           </div>
-          <div style={{ display: "flex", fontSize: "48px", fontWeight: 800, color: "#ffffff", letterSpacing: "-0.03em" }}>
-            Invoice
-            <span style={{ color: "#10b981" }}>Simple</span>
+
+          {/* Wordmark */}
+          <div style={{ display: "flex", alignItems: "baseline", gap: "0px" }}>
+            <span
+              style={{
+                fontSize: "52px",
+                fontWeight: 800,
+                color: "#ffffff",
+                letterSpacing: "-0.03em",
+                display: "flex",
+              }}
+            >
+              Invoice
+            </span>
+            <span
+              style={{
+                fontSize: "52px",
+                fontWeight: 800,
+                color: "#10b981",
+                letterSpacing: "-0.03em",
+                display: "flex",
+              }}
+            >
+              Simple
+            </span>
           </div>
         </div>
 
-        {/* Headline */}
+        {/* Tagline line 1 */}
         <div
           style={{
-            fontSize: "28px",
+            display: "flex",
+            fontSize: "26px",
             color: "rgba(255,255,255,0.5)",
             fontWeight: 400,
             letterSpacing: "-0.01em",
-            textAlign: "center",
-            maxWidth: "680px",
-            lineHeight: 1.4,
           }}
         >
           Create professional invoices in seconds.
-          <br />
-          Free, fast, and beautifully designed.
+        </div>
+
+        {/* Tagline line 2 */}
+        <div
+          style={{
+            display: "flex",
+            fontSize: "26px",
+            color: "rgba(255,255,255,0.35)",
+            fontWeight: 400,
+            letterSpacing: "-0.01em",
+            marginBottom: "40px",
+          }}
+        >
+          Free, no sign-up, instant PDF download.
         </div>
 
         {/* Feature pills */}
-        <div style={{ display: "flex", gap: "12px", marginTop: "40px" }}>
-          {["PDF Export", "3 Templates", "Invoice History", "Share Link"].map((f) => (
+        <div style={{ display: "flex", gap: "12px" }}>
+          {["PDF Export", "3 Templates", "Invoice History", "Share Link", "PWA"].map((f) => (
             <div
               key={f}
               style={{
+                display: "flex",
                 background: "rgba(255,255,255,0.06)",
                 border: "1px solid rgba(255,255,255,0.1)",
                 borderRadius: "8px",
                 padding: "8px 16px",
                 fontSize: "14px",
-                color: "rgba(255,255,255,0.6)",
+                color: "rgba(255,255,255,0.55)",
                 fontWeight: 500,
-                display: "flex",
               }}
             >
               {f}
