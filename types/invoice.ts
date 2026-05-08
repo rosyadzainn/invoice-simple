@@ -1,3 +1,5 @@
+export type InvoiceTemplate = "simple" | "modern" | "minimal";
+
 export interface InvoiceItem {
   id: string;
   description: string;
@@ -29,6 +31,7 @@ export interface InvoiceData {
 
   // Style
   accentColor: string;
+  template: InvoiceTemplate;
 
   // Totals
   discount: number;

@@ -29,6 +29,7 @@ const defaultInvoice: InvoiceData = {
   dueDate: "",
   currency: "USD",
   accentColor: "#10b981",
+  template: "simple" as const,
   items: [{ id: "item-1", description: "", quantity: 1, rate: 0 }],
   discount: 0,
   taxRate: 0,
