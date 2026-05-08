@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const BASE = "https://invoice-simple-three.vercel.app";
+const BASE = "https://zainogen.com";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
