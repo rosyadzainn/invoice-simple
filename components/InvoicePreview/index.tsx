@@ -339,27 +339,25 @@ export default function InvoicePreview({ data, onShare }: Props) {
           {/* ── Totals ── */}
           <div className="flex justify-end mb-7">
             <div className="w-full max-w-xs flex flex-col gap-2">
-              <div className="flex justify-between text-sm" style={{ color: C.muted }}>
+              <div className="flex justify-between gap-6 text-sm" style={{ color: C.muted }}>
                 <span className="whitespace-nowrap">{t.subtotal}</span>
                 <span className="tabular-nums whitespace-nowrap">{fmt(subtotal)}</span>
               </div>
               {data.discount > 0 && (
-                <div className="flex justify-between text-sm" style={{ color: C.muted }}>
+                <div className="flex justify-between gap-6 text-sm" style={{ color: C.muted }}>
                   <span className="whitespace-nowrap">{t.discount} ({data.discount}%)</span>
                   <span className="tabular-nums whitespace-nowrap" style={{ color: C.red }}>−{fmt(discount)}</span>
                 </div>
               )}
 
               {data.taxRate > 0 && (
-                <div className="flex justify-between text-sm" style={{ color: C.muted }}>
-                  <span className="whitespace-nowrap">
-                    {t.taxRate} ({data.taxRate}%)
-                  </span>
+                <div className="flex justify-between gap-6 text-sm" style={{ color: C.muted }}>
+                  <span className="whitespace-nowrap">{t.taxRate} ({data.taxRate}%)</span>
                   <span className="tabular-nums whitespace-nowrap">{fmt(tax)}</span>
                 </div>
               )}
               <div
-                className="flex justify-between text-sm font-black pt-2.5"
+                className="flex justify-between gap-6 text-sm font-black pt-2.5"
                 style={{
                   color: C.black,
                   borderTop: `2px solid ${data.accentColor}`,
