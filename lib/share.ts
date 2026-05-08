@@ -21,5 +21,5 @@ export function decodeInvoice(encoded: string): Partial<InvoiceData> | null {
 }
 
 export function getShareUrl(data: InvoiceData): string {
-  return `${window.location.origin}${window.location.pathname}?i=${encodeInvoice(data)}`;
+  return `${window.location.origin}/app?i=${encodeInvoice(data)}`;
 }

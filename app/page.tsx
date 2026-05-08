@@ -1,226 +1,202 @@
-"use client";
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import { FileText, Zap, LayoutTemplate, Clock, Share2, Smartphone, Globe } from "lucide-react";
 
-import { useState, useEffect } from "react";
-import { FileText, Users, Download, Printer, FilePlus, Clock } from "lucide-react";
-import { InvoiceData } from "@/types/invoice";
-import { LanguageProvider, useLanguage } from "@/context/LanguageContext";
-import InvoiceForm from "@/components/InvoiceForm";
-import InvoicePreview from "@/components/InvoicePreview";
-import InvoiceHistory from "@/components/InvoiceHistory";
-import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
-import { useOnlineCount } from "@/hooks/useOnlineCount";
-import { useStats } from "@/hooks/useStats";
-import { useInvoiceHistory } from "@/hooks/useInvoiceHistory";
-import { decodeInvoice, getShareUrl } from "@/lib/share";
-
-const today = new Date().toISOString().split("T")[0];
-
-const defaultInvoice: InvoiceData = {
-  senderName: "",
-  senderEmail: "",
-  senderAddress: "",
-  senderPhone: "",
-  logoUrl: null,
-  clientName: "",
-  clientEmail: "",
-  clientAddress: "",
-  invoiceNumber: "INV-001",
-  issueDate: today,
-  dueDate: "",
-  currency: "USD",
-  accentColor: "#10b981",
-  template: "simple" as const,
-  status: "unpaid" as const,
-  qrUrl: null,
-  signatureUrl: null,
-  items: [{ id: "item-1", description: "", quantity: 1, rate: 0 }],
-  discount: 0,
-  taxRate: 0,
-  paymentDetails: "",
-  notes: "",
-};
-
-
-function InvoiceApp() {
-  const { t } = useLanguage();
-  const { list, activeId, activeData, ready, update, createNew, loadEntry, removeEntry, duplicateEntry } =
-    useInvoiceHistory(defaultInvoice);
-  const [invoice, setInvoice] = useState<InvoiceData>(defaultInvoice);
-  const [historyOpen, setHistoryOpen] = useState(false);
-  const onlineCount = useOnlineCount();
-  const { pdfCount, printCount } = useStats();
-
-  // Sync local invoice state when switching active entry
-  useEffect(() => {
-    if (ready) setInvoice(activeData);
-  }, [activeId, ready]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Handle shared URL param after history is ready
-  useEffect(() => {
-    if (!ready) return;
-    const params = new URLSearchParams(window.location.search);
-    const encoded = params.get("i");
-    if (encoded) {
-      const decoded = decodeInvoice(encoded);
-      if (decoded) {
-        const merged = { ...defaultInvoice, ...decoded };
-        setInvoice(merged);
-        update(merged);
-      }
-    }
-  }, [ready]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleChange = (updates: Partial<InvoiceData>) => {
-    const next = { ...invoice, ...updates };
-    setInvoice(next);
-    update(next);
-  };
-
-  const handleShare = async () => {
-    const url = getShareUrl(invoice);
-    await navigator.clipboard.writeText(url);
-  };
-
-  const handleNew = () => {
-    if (confirm("Start a new invoice? Your current invoice will be saved to history.")) {
-      const fresh = { ...defaultInvoice, issueDate: new Date().toISOString().split("T")[0] };
-      createNew(fresh);
-      setInvoice(fresh);
-    }
-  };
-
-  const handleLoad = (id: string) => {
-    const data = loadEntry(id);
-    if (data) setInvoice(data);
-    setHistoryOpen(false);
-  };
-
-  const handleDelete = (id: string) => {
-    removeEntry(id);
-  };
-
-  const handleDuplicate = (id: string) => {
-    const data = duplicateEntry(id);
-    if (data) setInvoice(data);
-    setHistoryOpen(false);
-  };
-
-  return (
-    <div className="min-h-screen flex flex-col" style={{ background: "var(--background)" }}>
-      {/* Header */}
-      <header
-        className="sticky top-0 z-50 px-5 py-3.5 flex items-center justify-between no-print"
-        style={{
-          background: "rgba(8,8,8,0.88)",
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-          borderBottom: "1px solid rgba(255,255,255,0.09)",
-        }}
-      >
-        {/* Logo + wordmark */}
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-            <FileText size={15} className="text-white" />
-          </div>
-          <span className="font-semibold text-white text-lg tracking-tight">
-            Invoice<span className="gradient-text">Simple</span>
-          </span>
-          <button
-            onClick={handleNew}
-            className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 transition-colors ml-2"
-          >
-            <FilePlus size={13} />
-            <span>New</span>
-          </button>
-          <button
-            onClick={() => setHistoryOpen(true)}
-            className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 transition-colors"
-          >
-            <Clock size={13} />
-            <span>History</span>
-            {list.length > 1 && (
-              <span className="text-[10px] text-white/30 bg-white/8 rounded-full px-1.5 py-0.5 tabular-nums">
-                {list.length}
-              </span>
-            )}
-          </button>
-        </div>
-
-        {/* Right side: online count + language switcher */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 text-xs">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
-            <Users size={12} className="text-emerald-400" />
-            <span className="text-emerald-400 font-semibold">{onlineCount}</span>
-            <span className="text-white/35">online</span>
-          </div>
-          <LanguageSwitcher />
-        </div>
-      </header>
-
-      {/* Two-panel layout */}
-      <main className="flex-1 flex flex-col lg:flex-row min-h-0">
-        {/* Left — Form */}
-        <section
-          className="lg:w-[52%] overflow-y-auto p-6 lg:p-8 no-print"
-          style={{ borderRight: "1px solid rgba(255,255,255,0.06)" }}
-        >
-          <div className="max-w-2xl mx-auto">
-            <p className="text-xs font-semibold text-white/35 uppercase tracking-widest mb-5">
-              {t.invoiceDetails}
-            </p>
-            <InvoiceForm data={invoice} onChange={handleChange} />
-            <div className="h-12" />
-          </div>
-        </section>
-
-        {/* Right — Live Preview */}
-        <section
-          className="lg:w-[48%] overflow-y-auto p-6 lg:p-8 print-section"
-          style={{ background: "rgba(255,255,255,0.012)" }}
-        >
-          <div className="max-w-xl mx-auto">
-            <p className="text-xs font-semibold text-white/35 uppercase tracking-widest mb-5 no-print">
-              {t.livePreview}
-            </p>
-            <InvoicePreview data={invoice} onShare={handleShare} onChange={handleChange} />
-            <div className="h-12 no-print" />
-          </div>
-        </section>
-      </main>
-
-      {/* Invoice History drawer */}
-      {historyOpen && (
-        <InvoiceHistory
-          list={list}
-          activeId={activeId}
-          onLoad={handleLoad}
-          onDelete={handleDelete}
-          onDuplicate={handleDuplicate}
-          onClose={() => setHistoryOpen(false)}
-        />
-      )}
-
-      {/* Subtle stats widget — bottom right */}
-      <div className="fixed bottom-4 right-4 flex items-center gap-3 text-[10px] text-white/20 no-print select-none">
-        <div className="flex items-center gap-1">
-          <Download size={10} />
-          <span>{pdfCount.toLocaleString()}</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <Printer size={10} />
-          <span>{printCount.toLocaleString()}</span>
-        </div>
-      </div>
-    </div>
-  );
+interface Props {
+  searchParams: Promise<{ i?: string }>;
 }
 
-// Root export wraps everything in the language context.
-export default function Home() {
+export default async function Home({ searchParams }: Props) {
+  const params = await searchParams;
+  if (params.i) redirect(`/app?i=${params.i}`);
+
   return (
-    <LanguageProvider>
-      <InvoiceApp />
-    </LanguageProvider>
+    <div style={{ background: "#080808", minHeight: "100vh", color: "#fff", fontFamily: "var(--font-geist-sans)" }}>
+      {/* Nav */}
+      <nav style={{ borderBottom: "1px solid rgba(255,255,255,0.07)", padding: "0 24px" }}>
+        <div style={{ maxWidth: "1080px", margin: "0 auto", height: "60px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "linear-gradient(135deg, #10b981, #0d9488)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <FileText size={15} color="#fff" />
+            </div>
+            <span style={{ fontWeight: 600, fontSize: "17px", letterSpacing: "-0.02em" }}>
+              Invoice<span style={{ background: "linear-gradient(90deg,#10b981,#06b6d4)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Simple</span>
+            </span>
+          </div>
+          <Link
+            href="/app"
+            style={{
+              background: "linear-gradient(135deg, #10b981, #0d9488)",
+              color: "#fff",
+              padding: "8px 20px",
+              borderRadius: "8px",
+              fontWeight: 600,
+              fontSize: "13px",
+              textDecoration: "none",
+              letterSpacing: "-0.01em",
+            }}
+          >
+            Open App →
+          </Link>
+        </div>
+      </nav>
+
+      {/* Hero */}
+      <section style={{ maxWidth: "760px", margin: "0 auto", padding: "96px 24px 80px", textAlign: "center" }}>
+        <div style={{ display: "inline-block", background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: "20px", padding: "4px 14px", fontSize: "12px", color: "#10b981", fontWeight: 600, marginBottom: "28px", letterSpacing: "0.04em" }}>
+          100% FREE · NO SIGN-UP REQUIRED
+        </div>
+        <h1 style={{ fontSize: "clamp(40px, 7vw, 72px)", fontWeight: 900, lineHeight: 1.1, letterSpacing: "-0.04em", margin: "0 0 24px" }}>
+          Professional invoices,{" "}
+          <span style={{ background: "linear-gradient(135deg, #10b981, #06b6d4)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            created in seconds
+          </span>
+        </h1>
+        <p style={{ fontSize: "18px", color: "rgba(255,255,255,0.5)", lineHeight: 1.6, maxWidth: "540px", margin: "0 auto 40px" }}>
+          Design, preview, and download PDF invoices instantly. No account, no watermarks, no limits — just beautiful invoices.
+        </p>
+        <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
+          <Link
+            href="/app"
+            style={{
+              background: "linear-gradient(135deg, #10b981, #0d9488)",
+              color: "#fff",
+              padding: "14px 32px",
+              borderRadius: "10px",
+              fontWeight: 700,
+              fontSize: "15px",
+              textDecoration: "none",
+              letterSpacing: "-0.01em",
+              boxShadow: "0 0 40px rgba(16,185,129,0.3)",
+            }}
+          >
+            Create Invoice — Free
+          </Link>
+          <Link
+            href="/app"
+            style={{
+              background: "rgba(255,255,255,0.06)",
+              color: "rgba(255,255,255,0.7)",
+              padding: "14px 32px",
+              borderRadius: "10px",
+              fontWeight: 600,
+              fontSize: "15px",
+              textDecoration: "none",
+              border: "1px solid rgba(255,255,255,0.1)",
+            }}
+          >
+            See Demo
+          </Link>
+        </div>
+      </section>
+
+      {/* Mock invoice preview */}
+      <section style={{ maxWidth: "680px", margin: "0 auto 96px", padding: "0 24px" }}>
+        <div style={{ background: "#fff", borderRadius: "16px", padding: "40px 44px", boxShadow: "0 40px 80px rgba(0,0,0,0.6)", color: "#111" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "32px" }}>
+            <div>
+              <div style={{ width: "48px", height: "6px", background: "#10b981", borderRadius: "3px", marginBottom: "12px" }} />
+              <div style={{ fontWeight: 700, fontSize: "16px", color: "#111" }}>Your Company Name</div>
+              <div style={{ fontSize: "12px", color: "#888", marginTop: "4px" }}>hello@yourcompany.com</div>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <div style={{ fontSize: "22px", fontWeight: 900, letterSpacing: "0.1em", color: "#111" }}>INVOICE</div>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "#10b981", marginTop: "4px" }}>INV-001</div>
+            </div>
+          </div>
+          <div style={{ borderTop: "2px solid #111", marginBottom: "20px" }} />
+          {[
+            ["Web Design", "1", "$2,400.00"],
+            ["SEO Optimization", "3", "$600.00"],
+            ["Hosting Setup", "1", "$150.00"],
+          ].map(([desc, qty, amt]) => (
+            <div key={desc} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #f0f0f0", fontSize: "13px", color: "#444" }}>
+              <span>{desc}</span>
+              <span style={{ display: "flex", gap: "40px" }}>
+                <span style={{ color: "#888" }}>{qty}</span>
+                <span style={{ fontWeight: 600, color: "#111", minWidth: "80px", textAlign: "right" }}>{amt}</span>
+              </span>
+            </div>
+          ))}
+          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
+            <div style={{ width: "200px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#888", marginBottom: "8px" }}>
+                <span>Subtotal</span><span>$3,150.00</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "15px", fontWeight: 900, color: "#111", paddingTop: "8px", borderTop: "1px solid #ddd" }}>
+                <span>Total Due</span><span style={{ color: "#10b981" }}>$3,150.00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features grid */}
+      <section style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 24px 96px" }}>
+        <h2 style={{ textAlign: "center", fontSize: "clamp(28px,5vw,42px)", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: "12px" }}>
+          Everything you need
+        </h2>
+        <p style={{ textAlign: "center", fontSize: "16px", color: "rgba(255,255,255,0.4)", marginBottom: "56px" }}>
+          Professional features, zero cost.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
+          {[
+            { icon: <Zap size={20} />, title: "Instant PDF Export", desc: "Download pixel-perfect PDFs in one click. Print-ready, every time." },
+            { icon: <LayoutTemplate size={20} />, title: "3 Beautiful Templates", desc: "Simple, Modern, and Minimal designs. Switch with a single click." },
+            { icon: <Clock size={20} />, title: "Invoice History", desc: "Automatically saves up to 30 invoices locally. Duplicate, delete, reload." },
+            { icon: <Share2 size={20} />, title: "Shareable Links", desc: "Share a pre-filled invoice link with clients in one click." },
+            { icon: <Smartphone size={20} />, title: "Works Offline", desc: "Install as an app on your phone or desktop. No internet required." },
+            { icon: <Globe size={20} />, title: "Multi-language", desc: "UI available in English, Spanish, French, German, and more." },
+          ].map(({ icon, title, desc }) => (
+            <div
+              key={title}
+              style={{
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(255,255,255,0.07)",
+                borderRadius: "14px",
+                padding: "28px 28px 24px",
+              }}
+            >
+              <div style={{ color: "#10b981", marginBottom: "14px" }}>{icon}</div>
+              <div style={{ fontWeight: 700, fontSize: "15px", marginBottom: "8px" }}>{title}</div>
+              <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", lineHeight: 1.6 }}>{desc}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section style={{ textAlign: "center", padding: "0 24px 96px" }}>
+        <div style={{ maxWidth: "560px", margin: "0 auto", background: "rgba(16,185,129,0.07)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: "20px", padding: "56px 32px" }}>
+          <h2 style={{ fontSize: "clamp(24px,4vw,36px)", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: "12px" }}>
+            Ready to send your first invoice?
+          </h2>
+          <p style={{ fontSize: "15px", color: "rgba(255,255,255,0.45)", marginBottom: "28px" }}>
+            No account needed. Start now, download in seconds.
+          </p>
+          <Link
+            href="/app"
+            style={{
+              display: "inline-block",
+              background: "linear-gradient(135deg, #10b981, #0d9488)",
+              color: "#fff",
+              padding: "14px 36px",
+              borderRadius: "10px",
+              fontWeight: 700,
+              fontSize: "15px",
+              textDecoration: "none",
+              boxShadow: "0 0 40px rgba(16,185,129,0.25)",
+            }}
+          >
+            Create Free Invoice →
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "24px", textAlign: "center", fontSize: "12px", color: "rgba(255,255,255,0.2)" }}>
+        © {new Date().getFullYear()} InvoiceSimple · Free forever · No sign-up
+      </footer>
+    </div>
   );
 }

@@ -91,6 +91,33 @@ export async function downloadInvoicePDF(
         });
       });
 
+      // Fix images: html2canvas doesn't support object-fit, so images with
+      // width/height:auto + max constraints get stretched. We compute the
+      // correct pixel size from the natural aspect ratio and apply it explicitly.
+      origRoot.querySelectorAll<HTMLImageElement>("img").forEach((origImg) => {
+        const naturalW = origImg.naturalWidth;
+        const naturalH = origImg.naturalHeight;
+        if (!naturalW || !naturalH) return;
+
+        const cs   = window.getComputedStyle(origImg);
+        const maxW = parseFloat(cs.maxWidth)  || 9999;
+        const maxH = parseFloat(cs.maxHeight) || 9999;
+        const ratio = naturalW / naturalH;
+
+        let w = Math.min(naturalW, maxW);
+        let h = w / ratio;
+        if (h > maxH) { h = maxH; w = h * ratio; }
+
+        // Find the matching clone img by src
+        const cloneImg = cloneRoot.querySelector<HTMLImageElement>(`img[src="${CSS.escape(origImg.src)}"]`);
+        if (!cloneImg) return;
+        cloneImg.style.width      = `${w}px`;
+        cloneImg.style.height     = `${h}px`;
+        cloneImg.style.maxWidth   = "unset";
+        cloneImg.style.maxHeight  = "unset";
+        cloneImg.style.objectFit  = "unset";
+      });
+
       // Remove shadow / rounded corners on the outermost card so PDF edges
       // are crisp (shadows outside the element boundary are clipped anyway).
       cloneRoot.style.setProperty("box-shadow", "none");

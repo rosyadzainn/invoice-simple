@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -16,6 +16,16 @@ export const metadata: Metadata = {
   title: "Invoice Simple — Modern Invoice Generator",
   description:
     "Create, preview, and download professional invoices in seconds. Free, fast, and beautifully designed.",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "InvoiceSimple",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#10b981",
 };
 
 export default function RootLayout({

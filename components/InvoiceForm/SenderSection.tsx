@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef } from "react";
-import { Upload, X } from "lucide-react";
+import { useRef, useState, useEffect } from "react";
+import { Upload, X, Save, RotateCcw, Check } from "lucide-react";
 import { InvoiceData } from "@/types/invoice";
 import { useLanguage } from "@/context/LanguageContext";
 import Input from "@/components/ui/Input";
 import Textarea from "@/components/ui/Textarea";
+import { saveSenderProfile, loadSenderProfile } from "@/lib/senderProfile";
 
 interface Props {
   data: InvoiceData;
@@ -15,6 +16,12 @@ interface Props {
 export default function SenderSection({ data, onChange }: Props) {
   const { t } = useLanguage();
   const fileRef = useRef<HTMLInputElement>(null);
+  const [savedFlash, setSavedFlash] = useState(false);
+  const [hasSaved, setHasSaved] = useState(false);
+
+  useEffect(() => {
+    setHasSaved(loadSenderProfile() !== null);
+  }, []);
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -24,11 +31,57 @@ export default function SenderSection({ data, onChange }: Props) {
     reader.readAsDataURL(file);
   };
 
+  const handleSaveProfile = () => {
+    saveSenderProfile({
+      senderName: data.senderName,
+      senderEmail: data.senderEmail,
+      senderPhone: data.senderPhone,
+      senderAddress: data.senderAddress,
+      logoUrl: data.logoUrl,
+    });
+    setHasSaved(true);
+    setSavedFlash(true);
+    setTimeout(() => setSavedFlash(false), 2000);
+  };
+
+  const handleLoadProfile = () => {
+    const profile = loadSenderProfile();
+    if (profile) {
+      onChange({
+        senderName: profile.senderName,
+        senderEmail: profile.senderEmail,
+        senderPhone: profile.senderPhone,
+        senderAddress: profile.senderAddress,
+        logoUrl: profile.logoUrl,
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4">
-      <h3 className="text-xs font-semibold text-emerald-400/70 uppercase tracking-widest pl-3 border-l-2 border-emerald-500/50">
-        {t.from}
-      </h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-xs font-semibold text-emerald-400/70 uppercase tracking-widest pl-3 border-l-2 border-emerald-500/50">
+          {t.from}
+        </h3>
+        <div className="flex items-center gap-2">
+          {hasSaved && (
+            <button
+              onClick={handleLoadProfile}
+              className="flex items-center gap-1 text-[10px] text-white/35 hover:text-white/60 transition-colors"
+            >
+              <RotateCcw size={10} />
+              Load saved
+            </button>
+          )}
+          <button
+            onClick={handleSaveProfile}
+            className="flex items-center gap-1 text-[10px] text-white/35 hover:text-emerald-400 transition-colors"
+          >
+            {savedFlash ? <Check size={10} /> : <Save size={10} />}
+            {savedFlash ? "Saved!" : "Save info"}
+          </button>
+        </div>
+      </div>
 
       {/* Logo + business name row */}
       <div className="flex items-end gap-3">
