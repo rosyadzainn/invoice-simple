@@ -1,4 +1,5 @@
 export type InvoiceTemplate = "simple" | "modern" | "minimal";
+export type InvoiceStatus = "unpaid" | "paid" | "overdue";
 
 export interface InvoiceItem {
   id: string;
@@ -32,6 +33,11 @@ export interface InvoiceData {
   // Style
   accentColor: string;
   template: InvoiceTemplate;
+
+  // Status & extras
+  status: InvoiceStatus;
+  qrUrl: string | null;
+  signatureUrl: string | null;
 
   // Totals
   discount: number;

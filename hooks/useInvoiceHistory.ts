@@ -108,5 +108,26 @@ export function useInvoiceHistory(defaultData: InvoiceData) {
     [activeId, list]
   );
 
-  return { list, activeId, activeData, ready, update, createNew, loadEntry, removeEntry };
+  const duplicateEntry = useCallback(
+    (id: string): InvoiceData | null => {
+      const found = list.find((e) => e.id === id);
+      if (!found) return null;
+      const entry: SavedInvoice = {
+        id: crypto.randomUUID(),
+        data: { ...found.data, status: "unpaid" },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      setList((prev) => {
+        const next = [entry, ...prev].slice(0, MAX_HISTORY);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        return next;
+      });
+      setActiveId(entry.id);
+      return entry.data;
+    },
+    [list]
+  );
+
+  return { list, activeId, activeData, ready, update, createNew, loadEntry, removeEntry, duplicateEntry };
 }

@@ -158,13 +158,20 @@ export default function TemplateMinimal({ data, t, language }: Props) {
         </div>
       </div>
 
-      {/* Payment Details */}
-      {data.paymentDetails && (
+      {/* Payment Details + QR */}
+      {(data.paymentDetails || data.qrUrl) && (
         <>
           <div className="mb-5" style={{ height: "1px", backgroundColor: C.divider }} />
-          <div className="mb-5">
-            <p className="text-[9px] uppercase tracking-[0.2em] mb-2 font-semibold" style={{ color: C.subtle }}>{t.paymentDetails}</p>
-            <p className="text-xs whitespace-pre-line leading-relaxed" style={{ color: C.muted }}>{data.paymentDetails}</p>
+          <div className="mb-5 flex justify-between items-start gap-6">
+            {data.paymentDetails && (
+              <div className="flex-1 min-w-0">
+                <p className="text-[9px] uppercase tracking-[0.2em] mb-2 font-semibold" style={{ color: C.subtle }}>{t.paymentDetails}</p>
+                <p className="text-xs whitespace-pre-line leading-relaxed" style={{ color: C.muted }}>{data.paymentDetails}</p>
+              </div>
+            )}
+            {data.qrUrl && (
+              <img src={data.qrUrl} alt="Payment QR" style={{ width: "80px", height: "80px", objectFit: "contain", display: "block", flexShrink: 0 }} />
+            )}
           </div>
         </>
       )}
@@ -178,6 +185,16 @@ export default function TemplateMinimal({ data, t, language }: Props) {
             <p className="text-xs whitespace-pre-line leading-relaxed" style={{ color: C.muted }}>{data.notes}</p>
           </div>
         </>
+      )}
+
+      {/* Signature */}
+      {data.signatureUrl && (
+        <div className="flex flex-col items-end mt-8">
+          <img src={data.signatureUrl} alt="Signature" style={{ maxHeight: "56px", width: "auto", objectFit: "contain", display: "block" }} />
+          <div className="mt-1 pt-1" style={{ width: "160px", borderTop: `1px solid ${C.faint}`, textAlign: "right" }}>
+            <p className="text-[9px] uppercase tracking-[0.15em]" style={{ color: C.subtle }}>Authorized Signature</p>
+          </div>
+        </div>
       )}
     </div>
   );

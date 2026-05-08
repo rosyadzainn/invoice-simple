@@ -1,8 +1,8 @@
 "use client";
 
-import { X, Trash2 } from "lucide-react";
+import { X, Trash2, Copy } from "lucide-react";
 import { SavedInvoice, MAX_HISTORY } from "@/hooks/useInvoiceHistory";
-import { CURRENCIES } from "@/types/invoice";
+import { CURRENCIES, InvoiceStatus } from "@/types/invoice";
 import { calcSubtotal, calcDiscount, calcTax, calcTotal, formatCurrency } from "@/lib/calculations";
 
 interface Props {
@@ -10,15 +10,16 @@ interface Props {
   activeId: string;
   onLoad: (id: string) => void;
   onDelete: (id: string) => void;
+  onDuplicate: (id: string) => void;
   onClose: () => void;
 }
 
 function invoiceTotal(entry: SavedInvoice): string {
   const { items, discount, taxRate, currency } = entry.data;
   const cur = CURRENCIES.find((c) => c.code === currency) ?? CURRENCIES[0];
-  const sub = calcSubtotal(items);
+  const sub  = calcSubtotal(items);
   const disc = calcDiscount(sub, discount);
-  const tax = calcTax(sub - disc, taxRate);
+  const tax  = calcTax(sub - disc, taxRate);
   return formatCurrency(calcTotal(sub, disc, tax), cur.symbol);
 }
 
@@ -34,17 +35,27 @@ function relativeTime(iso: string): string {
   return new Date(iso).toLocaleDateString();
 }
 
-export default function InvoiceHistory({ list, activeId, onLoad, onDelete, onClose }: Props) {
+const STATUS_DOT: Record<InvoiceStatus, string> = {
+  unpaid:  "#6b7280",
+  paid:    "#10b981",
+  overdue: "#ef4444",
+};
+
+const STATUS_LABEL: Record<InvoiceStatus, string> = {
+  unpaid:  "Unpaid",
+  paid:    "Paid",
+  overdue: "Overdue",
+};
+
+export default function InvoiceHistory({ list, activeId, onLoad, onDelete, onDuplicate, onClose }: Props) {
   return (
     <>
-      {/* Backdrop */}
       <div
         className="fixed inset-0 z-40"
         style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }}
         onClick={onClose}
       />
 
-      {/* Drawer */}
       <div
         className="fixed left-0 top-0 h-full w-72 z-50 flex flex-col"
         style={{
@@ -59,10 +70,7 @@ export default function InvoiceHistory({ list, activeId, onLoad, onDelete, onClo
           style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}
         >
           <span className="text-sm font-semibold text-white">Invoice History</span>
-          <button
-            onClick={onClose}
-            className="text-white/40 hover:text-white transition-colors"
-          >
+          <button onClick={onClose} className="text-white/40 hover:text-white transition-colors">
             <X size={15} />
           </button>
         </div>
@@ -71,6 +79,7 @@ export default function InvoiceHistory({ list, activeId, onLoad, onDelete, onClo
         <div className="flex-1 overflow-y-auto py-1">
           {list.map((entry) => {
             const isActive = entry.id === activeId;
+            const status = entry.data.status ?? "unpaid";
             return (
               <div
                 key={entry.id}
@@ -81,20 +90,25 @@ export default function InvoiceHistory({ list, activeId, onLoad, onDelete, onClo
                   borderLeft: isActive ? "2px solid #10b981" : "2px solid transparent",
                 }}
                 onMouseEnter={(e) => {
-                  if (!isActive)
-                    (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)";
+                  if (!isActive) (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)";
                 }}
                 onMouseLeave={(e) => {
-                  if (!isActive)
-                    (e.currentTarget as HTMLElement).style.background = "";
+                  if (!isActive) (e.currentTarget as HTMLElement).style.background = "";
                 }}
               >
-                <div className="flex items-start justify-between gap-2 pr-6">
+                <div className="flex items-start justify-between gap-2 pr-14">
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-white truncate">
-                      {entry.data.invoiceNumber || "No number"}
-                    </p>
-                    <p className="text-xs text-white/40 truncate mt-0.5">
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                        style={{ background: STATUS_DOT[status] }}
+                        title={STATUS_LABEL[status]}
+                      />
+                      <p className="text-sm font-semibold text-white truncate">
+                        {entry.data.invoiceNumber || "No number"}
+                      </p>
+                    </div>
+                    <p className="text-xs text-white/40 truncate mt-0.5 pl-3">
                       {entry.data.clientName || "No client"}
                     </p>
                   </div>
@@ -108,17 +122,25 @@ export default function InvoiceHistory({ list, activeId, onLoad, onDelete, onClo
                   </div>
                 </div>
 
-                {list.length > 1 && (
+                {/* Action buttons (visible on hover) */}
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDelete(entry.id);
-                    }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1.5 rounded text-white/30 hover:text-red-400 transition-all duration-150"
+                    onClick={(e) => { e.stopPropagation(); onDuplicate(entry.id); }}
+                    className="p-1.5 rounded text-white/30 hover:text-emerald-400 transition-colors"
+                    title="Duplicate"
                   >
-                    <Trash2 size={13} />
+                    <Copy size={13} />
                   </button>
-                )}
+                  {list.length > 1 && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onDelete(entry.id); }}
+                      className="p-1.5 rounded text-white/30 hover:text-red-400 transition-colors"
+                      title="Delete"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  )}
+                </div>
               </div>
             );
           })}

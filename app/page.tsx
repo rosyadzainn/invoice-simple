@@ -30,6 +30,9 @@ const defaultInvoice: InvoiceData = {
   currency: "USD",
   accentColor: "#10b981",
   template: "simple" as const,
+  status: "unpaid" as const,
+  qrUrl: null,
+  signatureUrl: null,
   items: [{ id: "item-1", description: "", quantity: 1, rate: 0 }],
   discount: 0,
   taxRate: 0,
@@ -40,7 +43,7 @@ const defaultInvoice: InvoiceData = {
 
 function InvoiceApp() {
   const { t } = useLanguage();
-  const { list, activeId, activeData, ready, update, createNew, loadEntry, removeEntry } =
+  const { list, activeId, activeData, ready, update, createNew, loadEntry, removeEntry, duplicateEntry } =
     useInvoiceHistory(defaultInvoice);
   const [invoice, setInvoice] = useState<InvoiceData>(defaultInvoice);
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -94,6 +97,12 @@ function InvoiceApp() {
 
   const handleDelete = (id: string) => {
     removeEntry(id);
+  };
+
+  const handleDuplicate = (id: string) => {
+    const data = duplicateEntry(id);
+    if (data) setInvoice(data);
+    setHistoryOpen(false);
   };
 
   return (
@@ -174,7 +183,7 @@ function InvoiceApp() {
             <p className="text-xs font-semibold text-white/35 uppercase tracking-widest mb-5 no-print">
               {t.livePreview}
             </p>
-            <InvoicePreview data={invoice} onShare={handleShare} />
+            <InvoicePreview data={invoice} onShare={handleShare} onChange={handleChange} />
             <div className="h-12 no-print" />
           </div>
         </section>
@@ -187,6 +196,7 @@ function InvoiceApp() {
           activeId={activeId}
           onLoad={handleLoad}
           onDelete={handleDelete}
+          onDuplicate={handleDuplicate}
           onClose={() => setHistoryOpen(false)}
         />
       )}

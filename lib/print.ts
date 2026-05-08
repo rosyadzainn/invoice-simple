@@ -73,11 +73,25 @@ function buildTotalsRows(
     </tfoot>`;
 }
 
+function buildStamp(data: InvoiceData): string {
+  if (!data.status || data.status === "unpaid") return "";
+  const color = data.status === "paid" ? "#10b981" : "#ef4444";
+  const text  = data.status === "paid" ? "PAID" : "OVERDUE";
+  return `<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-22deg);border:5px solid ${color};border-radius:8px;padding:10px 36px;color:${color};font-size:52px;font-weight:900;letter-spacing:.15em;opacity:.22;pointer-events:none;z-index:999;font-family:Arial,sans-serif;white-space:nowrap;">${text}</div>`;
+}
+
 function buildPaymentNotes(data: InvoiceData, t: Translations): string {
-  const paymentHtml = data.paymentDetails
-    ? `<div style="margin-top:32px;padding-top:24px;border-top:1px solid #f3f4f6">
-        <p style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:8px">${t.paymentDetails}</p>
-        <p style="font-size:12px;color:#6b7280;line-height:1.7">${esc(data.paymentDetails)}</p>
+  const qrHtml = data.qrUrl
+    ? `<img src="${data.qrUrl}" alt="QR" style="width:80px;height:80px;object-fit:contain;display:block;flex-shrink:0" />`
+    : "";
+
+  const paymentHtml = (data.paymentDetails || data.qrUrl)
+    ? `<div style="margin-top:32px;padding-top:24px;border-top:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:flex-start;gap:24px">
+        ${data.paymentDetails ? `<div style="flex:1;min-width:0">
+          <p style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:8px">${t.paymentDetails}</p>
+          <p style="font-size:12px;color:#6b7280;line-height:1.7">${esc(data.paymentDetails)}</p>
+        </div>` : ""}
+        ${qrHtml}
       </div>` : "";
 
   const notesHtml = data.notes
@@ -86,7 +100,15 @@ function buildPaymentNotes(data: InvoiceData, t: Translations): string {
         <p style="font-size:12px;color:#6b7280;line-height:1.7">${esc(data.notes)}</p>
       </div>` : "";
 
-  return paymentHtml + notesHtml;
+  const signatureHtml = data.signatureUrl
+    ? `<div style="display:flex;flex-direction:column;align-items:flex-end;margin-top:40px">
+        <img src="${data.signatureUrl}" alt="Signature" style="max-height:56px;width:auto;object-fit:contain;display:block" />
+        <div style="width:160px;border-top:1px solid #d1d5db;padding-top:4px;margin-top:4px;text-align:right">
+          <p style="font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:#9ca3af">Authorized Signature</p>
+        </div>
+      </div>` : "";
+
+  return paymentHtml + notesHtml + signatureHtml;
 }
 
 // ── Simple ──────────────────────────────────────────────────────────────────
@@ -114,6 +136,7 @@ function buildSimpleHtml(data: InvoiceData, t: Translations, language: Language)
 <head><meta charset="UTF-8"/><title>Invoice ${esc(data.invoiceNumber)}</title>
 <style>${BASE_STYLE}</style></head>
 <body>
+  ${buildStamp(data)}
   <div style="height:5px;background:${data.accentColor}"></div>
   <div style="max-width:700px;margin:0 auto;padding:48px">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:40px">
@@ -192,6 +215,7 @@ function buildModernHtml(data: InvoiceData, t: Translations, language: Language)
 <head><meta charset="UTF-8"/><title>Invoice ${esc(data.invoiceNumber)}</title>
 <style>${BASE_STYLE}</style></head>
 <body>
+  ${buildStamp(data)}
   <div style="max-width:700px;margin:0 auto">
     <!-- Colored header -->
     <div style="background:${data.accentColor};padding:40px 48px">
@@ -282,6 +306,7 @@ function buildMinimalHtml(data: InvoiceData, t: Translations, language: Language
 <head><meta charset="UTF-8"/><title>Invoice ${esc(data.invoiceNumber)}</title>
 <style>${BASE_STYLE}</style></head>
 <body>
+  ${buildStamp(data)}
   <div style="max-width:700px;margin:0 auto;padding:56px 48px">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:40px">
       <div style="max-width:55%">
