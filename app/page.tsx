@@ -88,8 +88,13 @@ function InvoiceApp() {
     <div className="min-h-screen flex flex-col" style={{ background: "var(--background)" }}>
       {/* Header */}
       <header
-        className="glass sticky top-0 z-50 px-5 py-3.5 flex items-center justify-between no-print"
-        style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+        className="sticky top-0 z-50 px-5 py-3.5 flex items-center justify-between no-print"
+        style={{
+          background: "rgba(8,8,8,0.88)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          borderBottom: "1px solid rgba(255,255,255,0.09)",
+        }}
       >
         {/* Logo + wordmark */}
         <div className="flex items-center gap-3">
