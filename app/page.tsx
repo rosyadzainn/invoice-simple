@@ -1,6 +1,36 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { FileText, Zap, LayoutTemplate, Clock, Share2, Smartphone, Globe } from "lucide-react";
+import { encodeInvoice } from "@/lib/share";
+
+const demoEncoded = encodeInvoice({
+  senderName: "Acme Studio",
+  senderEmail: "hello@acmestudio.com",
+  senderPhone: "+1 (555) 123-4567",
+  senderAddress: "123 Creative Ave, San Francisco, CA 94103",
+  logoUrl: null,
+  clientName: "PT Maju Bersama",
+  clientEmail: "finance@majubersama.co.id",
+  clientAddress: "Jl. Sudirman No. 88, Jakarta Selatan 12190",
+  invoiceNumber: "INV-007",
+  issueDate: "2026-05-08",
+  dueDate: "2026-05-22",
+  currency: "USD",
+  accentColor: "#10b981",
+  template: "simple",
+  status: "unpaid",
+  qrUrl: null,
+  signatureUrl: null,
+  items: [
+    { id: "d1", description: "Web Design & Development", quantity: 1, rate: 2400 },
+    { id: "d2", description: "SEO Optimization", quantity: 3, rate: 200 },
+    { id: "d3", description: "Hosting & Domain Setup", quantity: 1, rate: 150 },
+  ],
+  discount: 5,
+  taxRate: 11,
+  paymentDetails: "Bank: Chase\nAccount: 8821-4456-0012\nRouting: 021000021",
+  notes: "Thank you for your business! Payment is due within 14 days.",
+});
 
 interface Props {
   searchParams: Promise<{ i?: string }>;
@@ -73,7 +103,7 @@ export default async function Home({ searchParams }: Props) {
             Create Invoice — Free
           </Link>
           <Link
-            href="/app"
+            href={`/app?i=${demoEncoded}`}
             style={{
               background: "rgba(255,255,255,0.06)",
               color: "rgba(255,255,255,0.7)",
