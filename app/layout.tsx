@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     title: "InvoiceSimple",
   },
   verification: {
-    google: "lB3jd9e1s7cSANk2SC2mtl4hfQuYLUqIizYI9HuOGWI",
+    google: "vysO-SzPkuGilfnB6TgNCQREi76GvQ6rvTdgayyPaSs",
   },
   robots: {
     index: true,
