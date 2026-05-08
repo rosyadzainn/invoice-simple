@@ -166,12 +166,6 @@ export function printInvoice(
 
     ${notesHtml}
 
-    <!-- Footer -->
-    <div style="margin-top:40px;padding-top:16px;border-top:1px solid #f3f4f6;display:flex;justify-content:space-between">
-      <p style="font-size:10px;color:#d1d5db">${t.thankYou}</p>
-      <p style="font-size:10px;color:#d1d5db">Simple</p>
-    </div>
-
   </div>
 </body>
 </html>`;

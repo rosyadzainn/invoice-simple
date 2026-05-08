@@ -420,18 +420,6 @@ export default function InvoicePreview({ data, onShare }: Props) {
           )}
         </div>
 
-        {/* ── Footer stripe ── */}
-        <div
-          className="px-8 sm:px-10 py-3 flex items-center justify-between"
-          style={{ backgroundColor: C.offWhite }}
-        >
-          <p className="text-[10px] font-medium" style={{ color: C.faint }}>
-            {t.thankYou}
-          </p>
-          <p className="text-[10px]" style={{ color: C.faint }}>
-            Simple
-          </p>
-        </div>
       </div>
     </div>
   );
